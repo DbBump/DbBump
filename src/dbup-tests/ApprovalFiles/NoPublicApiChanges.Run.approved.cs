@@ -1,5 +1,5 @@
 [assembly: System.CLSCompliant(true)]
-[assembly: System.Reflection.AssemblyMetadata("RepositoryUrl", "https://github.com/DbUp/DbUp.git")]
+[assembly: System.Reflection.AssemblyMetadata("RepositoryUrl", "https://github.com/DbBump/DbBump.git")]
 [assembly: System.Runtime.InteropServices.ComVisible(false)]
 [assembly: System.Runtime.InteropServices.Guid("9f833e49-6e35-4e4d-b2a0-3d4fed527c89")]
 [assembly: System.Runtime.Versioning.TargetFramework(".NETStandard,Version=v2.0", FrameworkDisplayName=".NET Standard 2.0")]

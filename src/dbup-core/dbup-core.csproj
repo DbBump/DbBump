@@ -1,17 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Description>DbUp makes it easy to deploy and upgrade SQL Server databases by running change scripts. This is the core library and should be used in conjunction with the database specific package (eg dbup-sqlserver, dbup-mysql)</Description>
-    <Title>DbUp Core library</Title>
-    <Company>DbUp Contributors</Company>
-    <Product>DbUp</Product>
-    <Copyright>Copyright © DbUp Contributors 2015</Copyright>
+    <Description>DbBump makes it easy to deploy and upgrade databases by running change scripts. It is a fork of DbUp. This is the core library and should be used in conjunction with a database specific package.</Description>
+    <Title>DbBump Core library</Title>
+    <Company>DbBump Contributors</Company>
+    <Product>DbBump</Product>
+    <Copyright>Copyright © DbUp Contributors 2015, DbBump Contributors 2026</Copyright>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>dbbump-core</AssemblyName>
     <RootNamespace>DbUp</RootNamespace>
-    <PackageId>dbup-core</PackageId>
+    <PackageId>dbbump-core</PackageId>
     <AssemblyOriginatorKeyFile>../dbup.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
-    <RepositoryUrl>https://github.com/DbUp/DbUp.git</RepositoryUrl>
+    <RepositoryUrl>https://github.com/DbBump/DbBump.git</RepositoryUrl>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 

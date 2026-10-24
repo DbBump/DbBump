@@ -61,9 +61,9 @@ jobs:
         working-directory: src  
 
       - name: Push NuGet packages to GitHub Packages ⬆️
-        if: ${{ format('{0}', env.GITHUB_TOKEN) != '' && startsWith(github.repository, 'DbUp/') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && github.actor != 'dependabot[bot]' }}
+        if: ${{ format('{0}', env.GITHUB_TOKEN) != '' && startsWith(github.repository, 'DbBump/') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && github.actor != 'dependabot[bot]' }}
         working-directory: artifacts
-        run: dotnet nuget push *.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source "https://nuget.pkg.github.com/DbUp/index.json"
+        run: dotnet nuget push *.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source "https://nuget.pkg.github.com/DbBump/index.json"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           
@@ -80,6 +80,6 @@ jobs:
         shell: pwsh
         working-directory: artifacts
         # Can't just use wildcard in this command due to https://github.com/cli/cli/issues/5099 so use Get-Item
-        run: gh release create --draft ${{ github.ref_name == 'main' && '' || '--prerelease' }}  --target ${{ github.ref_name }} --title $env:GitVersion_SemVer $env:GitVersion_SemVer (Get-Item dbup-core.*.nupkg)
+        run: gh release create --draft ${{ github.ref_name == 'main' && '' || '--prerelease' }}  --target ${{ github.ref_name }} --title $env:GitVersion_SemVer $env:GitVersion_SemVer (Get-Item dbbump-core.*.nupkg)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

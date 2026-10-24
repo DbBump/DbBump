@@ -1,4 +1,4 @@
-name: Publish DbUp Packages to NuGet
+name: Publish DbBump Packages to NuGet
 
 on:
   release:
@@ -22,7 +22,7 @@ jobs:
       - uses: robinraju/release-downloader@v1.3
         name: "Download Package from Release"
         with:
-          repository: "DbUp/DbUp"
+          repository: "DbBump/DbBump"
           token: ${{ secrets.GITHUB_TOKEN }}
           tag: "${{ github.event.release.tag_name }}"
           fileName: "*"

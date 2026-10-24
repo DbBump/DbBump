@@ -2,10 +2,10 @@
 
   <PropertyGroup>
     <TargetFramework>net8</TargetFramework>
-    <AssemblyName>DbUp.Tests.Common</AssemblyName>
+    <AssemblyName>DbBump.Tests.Common</AssemblyName>
     <RootNamespace>DbUp.Tests.Common</RootNamespace>
     <Nullable>enable</Nullable>
-    <RepositoryUrl>https://github.com/DbUp/DbUp.git</RepositoryUrl>
+    <RepositoryUrl>https://github.com/DbBump/DbBump.git</RepositoryUrl>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(CI)' == 'true'">

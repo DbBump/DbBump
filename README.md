@@ -1,3 +1,13 @@
+# DbBump
+
+DbBump is a fork of [DbUp](https://github.com/DbUp/DbUp). The goal of this fork is to work through DbUp's open issues and
+pull requests: review them, triage them, fix them and merge them in.
+
+Issues for this fork are tracked at [DbBump/DbBump](https://github.com/DbBump/DbBump/issues). The rest of this README,
+and the status badges below, describe the upstream DbUp project.
+
+# About DbUp
+
 DbUp is a set of .NET libraries that helps you to deploy changes to different databases like SQL Server. It tracks which
 SQL scripts have been run already, and runs the change scripts that are needed to get your database up to date.
 
@@ -61,9 +71,9 @@ Extensions to DbUp supporting versioning and script providers:
 
 ## NuGet Feed
 
-To build the providers, you will need to add the DbUp NuGet feed to your local machine. Do this by generating
+To build the providers, you will need to add the DbBump NuGet feed to your local machine. Do this by generating
 a GitHub token with `read:package` access and running:
 
 ```
-dotnet nuget add source --name DbUp --username <YourUsername> --password <TheToken> https://nuget.pkg.github.com/DbUp/index.json
+dotnet nuget add source --name DbBump --username <YourUsername> --password <TheToken> https://nuget.pkg.github.com/DbBump/index.json
 ```
