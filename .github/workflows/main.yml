@@ -5,10 +5,14 @@ name: CI
 
 on:
   pull_request:
+    paths-ignore:
+      - '**.md'
     branches:
       - 'release/**'
       - main
   push:
+    paths-ignore:
+      - '**.md'
   workflow_dispatch:
 
 jobs:
