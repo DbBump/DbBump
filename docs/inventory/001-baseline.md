@@ -154,7 +154,7 @@ Each repository has the same shape: `src/dbup-<name>/` (library), `src/Tests/` (
 
 Notes:
 
-- Every library project has exactly two kinds of `PackageReference`: `dbup-core` and the ADO.NET client package, as in the table. None has any other runtime package, and none of the providers' `Directory.Build.props` files adds one. For PostgreSql the client package version depends on the target framework, as the table shows. The sample projects are in section 3.4.
+- The only `PackageReference` entries in each library project are `dbup-core` and the ADO.NET client package, as in the table. There is no other runtime package, and none of the providers' `Directory.Build.props` files adds one. For PostgreSql the client package version depends on the target framework, as the table shows. The sample projects are in section 3.4.
 - The providers were built against `dbup-core` 6.0.15 or 6.1.1 from NuGet. The fork's core has been changed since (rebranding, assembly name `dbbump-core`). Whether each provider compiles and passes against the fork's core is not yet known.
 - Redshift and ClickHouse target only `net8.0`, so they cannot be used from .NET Framework or older .NET projects. Oracle targets `netstandard2.1`, which also rules out .NET Framework. The other five (SqlServer, PostgreSql, MySql, Sqlite, Firebird) target `netstandard2.0`, as does the fork's core. The spec says to keep existing target frameworks during the migration, so these differences stay.
 - Every library sets `GenerateDocumentationFile`, `SignAssembly` (except ClickHouse), and a `CI`-conditional block for deterministic builds and embedded debug symbols.
