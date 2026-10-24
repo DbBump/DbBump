@@ -12,7 +12,7 @@ SQL scripts have been run already, and runs the change scripts that are needed t
 
 # Documentation
 
-The documentation is at <https://dbbump.github.io/DbBump/>. Its source is in [`docs-website/`](docs-website).
+The documentation is at <https://dbbump.github.io/DbBump/>. 
 
 # Status
 
