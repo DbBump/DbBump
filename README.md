@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/logo.png" alt="DbBump: database migrations" width="300">
+</p>
+
 # DbBump
 
 DbBump is a fork of [DbUp](https://github.com/DbUp/DbUp). The goal of this fork is to work through DbUp's open issues and

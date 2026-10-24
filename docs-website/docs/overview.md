@@ -4,6 +4,10 @@ title: Overview
 description: DbBump is a .NET library that deploys changes to a database by running SQL change scripts that have not run yet.
 ---
 
+<p align="center">
+  <img src={require('@site/static/img/logo.png').default} alt="DbBump: database migrations" width="300" />
+</p>
+
 # DbBump
 
 DbBump is a set of .NET libraries that deploys changes to a database. It keeps a record of the SQL
