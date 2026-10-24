@@ -5,7 +5,7 @@
 **Captured:** 2026-10-24
 **Decisions:** [ADR 0001](../adr/0001-provider-import-layout.md)
 
-This document is the baseline that later tickets measure against. It records facts only. Nothing in the repository was changed to produce it. Upstream facts come from the GitHub API, shallow clones of each provider at the SHA shown, and the NuGet v3 API. Every upstream SHA is the full 40 characters.
+This document is the baseline that later tickets measure against. It is the single home for measured facts. Decisions are in the ADR, and section 6 lists open points. Nothing in the repository was changed to produce it. Upstream facts come from the GitHub API, shallow clones of each provider at the SHA shown, and the NuGet v3 API. Every upstream SHA is the full 40 characters.
 
 ## 1. The fork today
 
@@ -14,7 +14,7 @@ This document is the baseline that later tickets measure against. It records fac
 | Repository | `DbBump/DbBump` (fork of `DbUp/DbUp`) |
 | Branch inspected | `main` and `spec-001/baseline-inventory`, which point at the same commit |
 | Commit | `4848e65a25ecdd0191481699210b56bd7cbb75c9` (2026-10-24, "Merge pull request #31 from DbBump/docs/spec-001-monorepo") |
-| Working tree | Clean. No tracked changes and no untracked files that Git reports. |
+| Working tree | Measured on commit `4848e65` in a fresh clone or worktree: clean, with no tracked changes and no untracked files. The shared developer checkout is not clean (see below). |
 | Commits in history | 1075 |
 | `global.json` | None. The SDK is whatever is newest on the machine. |
 | Solution | `src/DbUp.sln` (classic `.sln`, three projects) |
@@ -28,6 +28,8 @@ This document is the baseline that later tickets measure against. It records fac
 | Test helpers | `src/Tests.Common/Tests.Common.csproj` | library, shared by test projects | `net10.0` | `DbBump.Tests.Common` | `DbBump.Tests.Common` (see below) |
 
 There are no sample projects and no other source projects.
+
+The shared developer checkout at `D:\Data\_CodeOS\Dbup` also has local-only items that a fresh clone or worktree does not: an untracked `.claude/` directory (agent worktrees) and the leftover build-output directories in section 1.4.
 
 Core details:
 
@@ -56,7 +58,7 @@ The version is 1.0.0 because nothing passes `/p:Version` locally. CI passes the 
 |---|---|
 | `.github/workflows/main.yml` | CI on `windows-latest`. GitVersion 5.x, restore, build, test, pack, upload artifacts. Uses `dotnet-version: 10.0.x`. |
 | `.github/workflows/create-release.yml` | Manual. Builds and creates a draft GitHub release with only `dbbump-core.*.nupkg`. |
-| `.github/workflows/publish-release.yml` | On release published, downloads the release assets and runs `dotnet nuget push *.nupkg --skip-duplicate`. The spec (6.3) forbids silently skipping duplicates, so this changes in Phase 6. |
+| `.github/workflows/publish-release.yml` | On release published, downloads the release assets and runs `dotnet nuget push *.nupkg --skip-duplicate`. The spec (6.3) forbids silently skipping duplicates, so the two conflict. |
 | `.github/workflows/test-report.yml` | Publishes test reports after CI or Create Release. |
 | `.github/workflows/docs.yml` | Builds and deploys `docs-website/` to GitHub Pages. |
 | `.github/dependabot.yml` | Weekly NuGet updates for `/`. |
@@ -74,7 +76,7 @@ Tracked in Git:
 - `src/dbup.snk` (see section 5.5).
 - `src/.idea/` and `src/DbUp.sln.DotSettings` (Rider settings).
 
-Present in the shared checkout at `D:\Data\_CodeOS\Dbup\src` but not tracked and not in a fresh worktree. All three contain only build output, which `.gitignore` hides (`bin/`, `obj`), so Git reports the tree as clean:
+Present in the shared checkout at `D:\Data\_CodeOS\Dbup\src` but not tracked and not in a fresh clone or worktree. All three contain only build output, which `.gitignore` hides (`bin/`, `obj`), so `git status` does not list them:
 
 | Directory | Files | What is in it |
 |---|---|---|
@@ -106,7 +108,7 @@ The SDK 11 build prints message `NETSDK1057` (preview SDK). It is not a warning.
 | `dbup-tests` | `net10.0` | 100 | 0 | 0 | 100 |
 | `Tests.Common` | n/a | not a test project | | | |
 
-The same counts (100/0/0) came out on SDK 11 Debug, SDK 11 Release and SDK 10.0.402 Debug. The run took under one second. CI pins `10.0.x`, so SDK 10.0.402 is the closest match to CI. Phase 3 should add a `global.json`.
+The same counts (100/0/0) came out on SDK 11 Debug, SDK 11 Release and SDK 10.0.402 Debug. The run took under one second. CI pins `10.0.x`, so SDK 10.0.402 is the closest match to CI.
 
 ## 3. Upstream providers
 
@@ -127,32 +129,33 @@ Commit counts are the number of commits on `main`. "Release tag" is the latest G
 
 For reference, `DbUp/DbUp` (the original core) has default branch `main`, head `41228ce747979fb52e1a59e3eec5823e6de869c8` (2026-02-18). The fork's relationship to that commit is not part of this ticket.
 
-The SHAs were read twice: from the commits API and from `git rev-parse` in the shallow clones. They agreed for all eight. They are the revisions to import. Phase 2 must re-check them before importing, because `main` can move.
+The SHAs were read twice: from the commits API and from `git rev-parse` in the shallow clones. They agreed for all eight. They are the revisions to import. They are the heads of `main` on the capture date, and `main` can move after it.
 
 ### 3.1 Licence and copyright
 
 All eight `license.txt` files are byte-identical (SHA-256 prefix `a95b48f348fd`): MIT, first line "Copyright (C) 2015 DbUp contributors." Every csproj carries `Copyright © DbUp Contributors 2015` except Redshift, which has none. The fork's root `license.txt` has the same text, wrapped differently, with no DbBump line. The fork's `dbbump-core` csproj says "Copyright © DbUp Contributors 2015, DbBump Contributors 2026".
 
-The PostgreSql repo also ships `src/dbup-postgresql/Npgsql-LICENSE`, a third-party licence file that must be kept.
+The PostgreSql repo also ships `src/dbup-postgresql/Npgsql-LICENSE`, a third-party licence file.
 
 ### 3.2 Layout, target frameworks and dependencies
 
 Each repository has the same shape: `src/dbup-<name>/` (library), `src/Tests/` (tests), optional `src/Sample/`, plus repo-level files. Source file counts (`.cs`, including tests and samples): SqlServer 20, PostgreSql 16, MySql 14, Sqlite 16, Oracle 14, Firebird 11, Redshift 10, ClickHouse 14.
 
-| Provider | Library TFM | `dbup-core` NuGet version | Driver package | Assembly / package ID today | Root namespace |
-|---|---|---|---|---|---|
-| SqlServer | `netstandard2.0` | 6.1.1 | `Microsoft.Data.SqlClient` 6.1.4 | `dbup-sqlserver` | `DbUp.SqlServer` |
-| PostgreSql | `netstandard2.0`, `net8.0` | 6.1.1 | `Npgsql` 8.0.7 (netstandard2.0), `Npgsql` 10.0.1 (net8.0) | `dbup-postgresql` | `DbUp.Postgresql` |
-| MySql | `netstandard2.0` | 6.0.15 | `MySqlConnector` 2.3.5 | `dbup-mysql` | `DbUp.MySql` |
-| Sqlite | `netstandard2.0` | 6.0.15 | `Microsoft.Data.Sqlite.Core` 9.0.10 | `dbup-sqlite` | `DbUp.Sqlite` |
-| Oracle | `netstandard2.1` | 6.1.1 | `Oracle.ManagedDataAccess.Core` 23.26.100 | `dbup-oracle` | `DbUp.Oracle` |
-| Firebird | `netstandard2.0` | 6.1.1 | `FirebirdSql.Data.FirebirdClient` 10.3.4 | `dbup-firebird` | `DbUp.Firebird` |
-| Redshift | `net8.0` | 6.0.15 | `Npgsql` 9.0.4 | `dbup-redshift` | `DbUp.Redshift` |
-| ClickHouse | `net8` (alias for `net8.0`) | 6.1.1 | `ClickHouse.Driver` 1.0.0 | `dbup-clickhouse` | `DbUp.ClickHouse` |
+| Provider | Library TFM | `dbup-core` NuGet version | ADO.NET client package | Other runtime packages | Assembly / package ID today | Root namespace |
+|---|---|---|---|---|---|---|
+| SqlServer | `netstandard2.0` | 6.1.1 | `Microsoft.Data.SqlClient` 6.1.4 | none | `dbup-sqlserver` | `DbUp.SqlServer` |
+| PostgreSql | `netstandard2.0`, `net8.0` | 6.1.1 | `Npgsql` 8.0.7 (netstandard2.0), `Npgsql` 10.0.1 (net8.0) | none | `dbup-postgresql` | `DbUp.Postgresql` |
+| MySql | `netstandard2.0` | 6.0.15 | `MySqlConnector` 2.3.5 | none | `dbup-mysql` | `DbUp.MySql` |
+| Sqlite | `netstandard2.0` | 6.0.15 | `Microsoft.Data.Sqlite.Core` 9.0.10 | none | `dbup-sqlite` | `DbUp.Sqlite` |
+| Oracle | `netstandard2.1` | 6.1.1 | `Oracle.ManagedDataAccess.Core` 23.26.100 | none | `dbup-oracle` | `DbUp.Oracle` |
+| Firebird | `netstandard2.0` | 6.1.1 | `FirebirdSql.Data.FirebirdClient` 10.3.4 | none | `dbup-firebird` | `DbUp.Firebird` |
+| Redshift | `net8.0` | 6.0.15 | `Npgsql` 9.0.4 | none | `dbup-redshift` | `DbUp.Redshift` |
+| ClickHouse | `net8` (alias for `net8.0`) | 6.1.1 | `ClickHouse.Driver` 1.0.0 | none | `dbup-clickhouse` | `DbUp.ClickHouse` |
 
 Notes:
 
-- The providers were built against `dbup-core` 6.0.15 or 6.1.1 from NuGet. The fork's core has been changed since (rebranding, assembly name `dbbump-core`). Whether each provider compiles and passes against the fork's core is unknown until Phase 3.
+- Every library project has exactly two kinds of `PackageReference`: `dbup-core` and the ADO.NET client package, as in the table. None has any other runtime package, and none of the providers' `Directory.Build.props` files adds one. For PostgreSql the client package version depends on the target framework, as the table shows. The sample projects are in section 3.4.
+- The providers were built against `dbup-core` 6.0.15 or 6.1.1 from NuGet. The fork's core has been changed since (rebranding, assembly name `dbbump-core`). Whether each provider compiles and passes against the fork's core is not yet known.
 - Redshift and ClickHouse target only `net8.0`, so they cannot be used from .NET Framework or older .NET projects. Oracle targets `netstandard2.1`, which also rules out .NET Framework. The other five (SqlServer, PostgreSql, MySql, Sqlite, Firebird) target `netstandard2.0`, as does the fork's core. The spec says to keep existing target frameworks during the migration, so these differences stay.
 - Every library sets `GenerateDocumentationFile`, `SignAssembly` (except ClickHouse), and a `CI`-conditional block for deterministic builds and embedded debug symbols.
 
@@ -175,16 +178,16 @@ The infrastructure column comes from reading the test sources and csproj files a
 
 Findings that affect later phases:
 
-- Only ClickHouse has tests against a real database engine. The spec's integration matrix (section 8) is new work for the other seven providers, not a migration of existing tests.
-- Every test project is named `Tests` and builds `Tests.dll`. Eight of them in one solution collide on assembly name and project name. They also collide with the planned `tests/<Provider>` folder layout unless renamed.
+- Only ClickHouse has tests against a real database engine. The spec's integration matrix (section 8) therefore covers seven providers that have no real-database tests today.
+- Every test project is named `Tests` and builds `Tests.dll`. Eight projects cannot share one project name and assembly name in one solution. `Tests` is also the directory name in each provider today, where the destination is `tests/<Provider>` (section 3.5).
 - Every provider has a `NoPublicApiChanges` test with an approval file, and these compare against the public API of that provider's assembly. Any rename of the assembly or namespace will show up as a failing approval test.
-- The test projects restore `DbUp.Tests.Common` 6.x from a package feed. nuget.org only has `dbup.tests.common` 5.0.37, so the 6.x package must come from the DbUp GitHub Packages feed (see section 3.4). The fork's own `Tests.Common` project replaces it as a project reference. It keeps the namespace `DbUp.Tests.Common` and the same type names, but its assembly is `DbBump.Tests.Common`.
-- SqlServer has a test that asserts `Microsoft.Data.SqlClient` is a 6.1.x build. Central package management must not move that version without updating the test. The same test file has a check that fails after 2028-08-14.
+- The test projects restore `DbUp.Tests.Common` 6.x from a package feed. nuget.org only has `dbup.tests.common` 5.0.37, so the 6.x package comes from a feed other than nuget.org. The ClickHouse `.gitlab-ci.yml` (section 3.4) names `https://nuget.pkg.github.com/DbUp/index.json`. The fork's own `Tests.Common` project replaces it as a project reference. It keeps the namespace `DbUp.Tests.Common` and the same type names, but its assembly is `DbBump.Tests.Common`.
+- SqlServer has a test that asserts `Microsoft.Data.SqlClient` is a 6.1.x build. A central package version that moves it would fail the test. The same test file has a check that fails after 2028-08-14.
 - The provider test projects use `Shouldly` without referencing it. It arrives through `DbUp.Tests.Common`. The fork's `Tests.Common` also references `Shouldly` 4.3.0.
 
 ### 3.4 Standalone build, CI and versioning files that become obsolete
 
-Present in every provider unless noted. Phase 2 removes these after import.
+Present in every provider unless noted. Spec section 4.1 (step 6) removes obsolete standalone CI and release configuration after import; these are the files that apply.
 
 | File | Why it is obsolete |
 |---|---|
@@ -194,7 +197,7 @@ Present in every provider unless noted. Phase 2 removes these after import.
 | `GitVersion.yml` | `mode: Mainline`. SqlServer also ignores commits before 2024-11-06. Replaced by the root `GitVersion.yml`. |
 | `src/Directory.Build.props` | Sets authors, project URL, licence, `TreatWarningsAsErrors` and `LangVersion`. Its `RepositoryUrl` is wrong in seven providers (`https://github.com/dbup-<name>/dbup-<name>.git`), but each csproj sets the correct value and wins. ClickHouse is correct in both. |
 | `src/dbup-<name>.sln` and `.sln.DotSettings` | Replaced by the root solution. |
-| `src/.editorconfig` | Seven providers have an identical file. The eighth and the fork's own differ from it. Compare with the fork's before deleting. |
+| `src/.editorconfig` | Seven providers have an identical file. The eighth and the fork's own differ from it. |
 | `src/dbup.snk` | The same key as the fork's (section 5.5). |
 | `src/dbup-icon.png` | Same image in all eight (SHA-256 prefix `9e00fc36`). The fork uses `dbbump-icon.png`. |
 | `.gitattributes`, `.gitignore` | Per-repo. |
@@ -204,15 +207,38 @@ Extra files:
 - SqlServer: `src/dbup/dbup.nuspec` and `src/dbup/Shim.txt`, the source of the obsolete `dbup` shim package.
 - ClickHouse: `.gitlab-ci.yml` (builds on a private GitLab with a `nuget.rapidsoft.ru` feed and a GitHub Packages feed using a personal token) and `start-clickhouse.ps1` (starts `clickhouse/clickhouse-server:23.6-alpine`; a different version from the one the tests use).
 - Firebird: `src/Sample/` with `docker-compose.yml`, `appsettings.json` and `README.md`.
-- SqlServer, Sqlite, Firebird: `src/Sample/Sample.csproj`, target frameworks `net7.0`, `net8`, `net8.0`. Namespaces `SampleApplication`, `SqliteSampleApplication`, `FirebirdSampleApplication`.
-- MySql: `src/Tests/MySqlSupportTests.CanHandleDelimiter.approved.txt`, a test data file that must travel with the tests.
+- Sample projects exist in SqlServer, Sqlite and Firebird only, at `src/Sample/Sample.csproj`. All set `IsPackable=false`. Each references its provider library by project reference. Namespaces are `SampleApplication`, `SqliteSampleApplication` and `FirebirdSampleApplication`.
+
+  | Provider | Target framework | Packages |
+  |---|---|---|
+  | SqlServer | `net7.0` | none |
+  | Sqlite | `net8` | `Microsoft.Data.Sqlite` 9.0.0 |
+  | Firebird | `net8.0` | `Microsoft.Extensions.Configuration.Json` 9.0.0 |
+- MySql: `src/Tests/MySqlSupportTests.CanHandleDelimiter.approved.txt`, a test data file used by the MySql tests.
 - Each `README.md` has shields pointing at the old repository and NuGet package.
+
+### 3.5 Destination directories
+
+Spec section 2.1 asks for each repository's URL, branch or tag, commit SHA, import date, original licence and destination directory. The URL, branch, SHA and latest release tag are in the table at the start of section 3, and the licence is in section 3.1. The import date does not exist yet, because nothing has been imported. The destination directories are set by [ADR 0001](../adr/0001-provider-import-layout.md) and are in this table, next to the project paths in each upstream repository today.
+
+| Provider | Library project today | Test project today | Library destination | Tests destination |
+|---|---|---|---|---|
+| SqlServer | `src/dbup-sqlserver/dbup-sqlserver.csproj` | `src/Tests/Tests.csproj` | `src/SqlServer` | `tests/SqlServer` |
+| PostgreSql | `src/dbup-postgresql/dbup-postgresql.csproj` | `src/Tests/Tests.csproj` | `src/PostgreSql` | `tests/PostgreSql` |
+| MySql | `src/dbup-mysql/dbup-mysql.csproj` | `src/Tests/Tests.csproj` | `src/MySql` | `tests/MySql` |
+| Sqlite | `src/dbup-sqlite/dbup-sqlite.csproj` | `src/Tests/Tests.csproj` | `src/Sqlite` | `tests/Sqlite` |
+| Oracle | `src/dbup-oracle/dbup-oracle.csproj` | `src/Tests/Tests.csproj` | `src/Oracle` | `tests/Oracle` |
+| Firebird | `src/dbup-firebird/dbup-firebird.csproj` | `src/Tests/Tests.csproj` | `src/Firebird` | `tests/Firebird` |
+| Redshift | `src/dbup-redshift/dbup-redshift.csproj` | `src/Tests/Tests.csproj` | `src/Redshift` | `tests/Redshift` |
+| ClickHouse | `src/dbup-clickhouse/dbup-clickhouse.csproj` | `src/Tests/Tests.csproj` | `src/ClickHouse` | `tests/ClickHouse` |
+
+The core moves in the same way: `src/dbup-core` to `src/Core` and `src/dbup-tests` to `tests/Core`. Spec section 3 shows a top-level `samples/` directory. It does not say where the three sample projects in section 3.4 go.
 
 ## 4. Provider-to-provider dependencies
 
 None of the eight packages depends on another provider's package, and no source file uses another provider's namespace.
 
-**Redshift does not depend on PostgreSql.** `dbup-redshift` references `Npgsql` 9.0.4 directly and builds its own `RedshiftConnectionManager` and `RedshiftExtensions` on `NpgsqlConnection` and `NpgsqlConnectionStringBuilder`. It has no reference to `dbup-postgresql` or to `DbUp.Postgresql`. This means Redshift can be imported and packed with only the core as an internal dependency. It does mean `Npgsql` appears at three versions across two providers (8.0.7, 10.0.1, 9.0.4), which central package management must handle on purpose (section 5.3).
+**Redshift does not depend on PostgreSql.** `dbup-redshift` references `Npgsql` 9.0.4 directly and builds its own `RedshiftConnectionManager` and `RedshiftExtensions` on `NpgsqlConnection` and `NpgsqlConnectionStringBuilder`. It has no reference to `dbup-postgresql` or to `DbUp.Postgresql`. This means Redshift can be imported and packed with only the core as an internal dependency. `Npgsql` appears at three versions across two providers (8.0.7, 10.0.1, 9.0.4); see section 5.3.
 
 Every provider depends on the core, and every test project depends on `Tests.Common`. The dependency graph is therefore a star around the core.
 
@@ -254,9 +280,9 @@ The IDs the providers publish under today are all taken by the DbUp project, whi
 
 ### 5.2 Assembly and project name conflicts
 
-- Eight test projects each named `Tests`, each building `Tests.dll`. Must be renamed on import. This is the only conflict that blocks a single solution outright.
+- Eight test projects each named `Tests`, each building `Tests.dll`. This is the only conflict that blocks a single solution outright.
 - The fork's `Tests.Common` assembly is `DbBump.Tests.Common`; the providers expect the package `DbUp.Tests.Common`. The namespace is the same, so provider test code compiles unchanged once the project reference is in place.
-- The fork's core assembly is `dbbump-core`. Provider code compiled against `dbup-core` binds by assembly name, so every provider must be rebuilt, not just repackaged. A consumer who ends up with both `dbup-core` and `dbbump-core` loaded gets two copies of every `DbUp.*` type.
+- The fork's core assembly is `dbbump-core`. Provider code compiled against `dbup-core` binds by assembly name, so a provider built against `dbup-core` does not bind to `dbbump-core` without a rebuild. A consumer who ends up with both `dbup-core` and `dbbump-core` loaded gets two copies of every `DbUp.*` type.
 - Strong-name identity: all providers and the core are signed with the same key. ClickHouse is unsigned, which is allowed (an unsigned assembly may reference a signed one) but means it has no strong name.
 
 ### 5.3 Package version conflicts for central package management
@@ -275,24 +301,29 @@ All other shared packages (`xunit` 2.9.3, `xunit.runner.visualstudio` 3.1.5, `NS
 
 No two assemblies define the same namespace-and-type pair. No provider file shares a name with a core file other than `AssemblyInfo.cs`, which is per-assembly and does not collide. Differences to note:
 
-- Casing: the namespace is `DbUp.Postgresql` and `DbUp.MySql`, while the planned directory is `PostgreSql` and the spec writes "PostgreSql". The ID `dbbump-postgresql` is lower case, so the three spellings do not clash but should not be "fixed" during import. Namespaces stay as they are (ADR 0001).
+- Casing: the namespace is `DbUp.Postgresql` and `DbUp.MySql`, while the planned directory is `PostgreSql` and the spec writes "PostgreSql". The ID `dbbump-postgresql` is lower case, so the three spellings do not clash. The migration does not change namespaces (ADR 0001).
 - Test namespaces are inconsistent. Most providers use `DbUp.<Provider>.Tests`. Oracle uses `DbUp.Tests.Providers.Oracle` and `DbUp.Tests.Support.Oracle`. Firebird uses `DbUp.Tests.Providers.Firebird`. The core tests use `DbUp.Tests` and sub-namespaces, so Oracle and Firebird tests sit inside the core test namespace tree. No type clashes today.
 - Every provider test class `NoPublicApiChanges` and `DatabaseSupportTests` has the same simple name, which is fine because the namespaces differ, but it matters if tests are ever merged into one project.
 - Sample namespaces (`SampleApplication`, `SqliteSampleApplication`, `FirebirdSampleApplication`) are outside `DbUp.*`.
-- The fork's `Directory.Build.props` sets `TreatWarningsAsErrors=true` and each provider's does too. Providers have only ever been built with their own settings, so warnings from the newer core and SDK may surface in Phase 3.
+- The fork's `Directory.Build.props` sets `TreatWarningsAsErrors=true` and each provider's does too. Providers have only ever been built with their own settings, so whether warnings from the newer core and SDK appear under these settings is unknown until they are built together.
 
 ### 5.5 Strong-name keys
 
-The same `dbup.snk` (SHA-256 prefix `b65296a5276c725d`, 596 bytes) is in the fork and in all eight providers. Seven providers sign with it. ClickHouse has the file but does not set `SignAssembly`. Firebird sets `PublicSign` on non-Windows, so it is public-signed there. Because the key is identical, one root copy is enough, and its location must be fixed up in every `AssemblyOriginatorKeyFile` path.
+The same `dbup.snk` (SHA-256 prefix `b65296a5276c725d`, 596 bytes) is in the fork and in all eight providers. Seven providers sign with it. ClickHouse has the file but does not set `SignAssembly`. Firebird sets `PublicSign` on non-Windows, so it is public-signed there. Because the key is identical, one root copy could serve all of them. Seven provider projects set `AssemblyOriginatorKeyFile` to `../dbup.snk`, relative to the library project directory.
 
 ## 6. Open points for later tickets
 
-These are observations, not decisions.
+These are observations and questions, not decisions. Where the facts are already in this document, the item points to them.
 
-1. The shared checkout has untracked `src/dbup-redshift`, `src/dbup-sqlite-mono` and `src/dbup-tests-sqlite` directories (build output only). The flattened layout uses `src/<Provider>`, which does not collide with these names, but a clean clone will not have them and a developer's old checkout will.
-2. `src/dbup.1.2.3.nupkg` is a tracked binary for an unrelated, obsolete package. Whether to delete it belongs in the cleanup phase.
-3. `Tests.Common` is packable by accident. Set `IsPackable=false` when the central build properties arrive (Phase 3), or decide to publish it.
-4. `publish-release.yml` uses `--skip-duplicate`, which conflicts with spec section 6.3.
-5. No `global.json` exists. The baseline ran on a preview SDK because it was the newest installed.
-6. ClickHouse tests use an unpinned `:latest` container image, which conflicts with spec section 8.1.
-7. The upstream provider CI is external (`DbUp/Universe`), so nothing about how upstream ran its tests can be recovered from the provider repositories.
+1. Untracked build-output directories in the shared checkout: section 1.4.
+2. Whether to delete the tracked `src/dbup.1.2.3.nupkg`: section 1.4 (cleanup phase).
+3. `Tests.Common` is packable by accident: section 1.2. Set `IsPackable=false` when the central build properties arrive (Phase 3), or decide to publish it.
+4. `publish-release.yml` uses `--skip-duplicate`: section 1.3 (spec 6.3, Phase 6).
+5. Add a `global.json` (Phase 3). The baseline ran on a preview SDK: section 2.
+6. ClickHouse tests use an unpinned `:latest` container image: section 3.3 (spec 8.1).
+7. Upstream CI is external, so how upstream ran its tests cannot be recovered: section 3.4.
+8. Re-check the section 3 SHAs against each provider's `main` immediately before the import (Phase 2).
+9. Give the eight test projects unique project and assembly names: section 5.2.
+10. Pick one `Npgsql` version, and one `Microsoft.NET.Test.Sdk` and `Microsoft.Data.Sqlite` version, for central package management: section 5.3.
+11. Decide where the three sample projects go and where `dbup.snk` lives, then update the `AssemblyOriginatorKeyFile` paths: sections 3.5 and 5.5.
+12. Compare the providers' `.editorconfig` with the fork's before deleting it: section 3.4.
