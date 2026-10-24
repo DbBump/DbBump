@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <AssemblyName>DbBump.Tests.Common</AssemblyName>
     <RootNamespace>DbUp.Tests.Common</RootNamespace>
     <Nullable>enable</Nullable>
@@ -18,7 +18,6 @@
     <ProjectReference Include="..\dbup-core\dbup-core.csproj"/>
     <PackageReference Include="Assent" Version="3.0.1" />
     <PackageReference Include="PublicApiGenerator" Version="11.4.5" />
-    <PackageReference Include="System.Runtime.InteropServices.RuntimeInformation" Version="4.3.0"/>
     <PackageReference Include="TestStack.BDDfy.Xunit" Version="2.0.1" />
     <PackageReference Include="Shouldly" Version="4.3.0" />
   </ItemGroup>
