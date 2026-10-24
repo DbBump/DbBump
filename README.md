@@ -3,8 +3,7 @@
 DbBump is a fork of [DbUp](https://github.com/DbUp/DbUp). The goal of this fork is to work through DbUp's open issues and
 pull requests: review them, triage them, fix them and merge them in.
 
-Issues for this fork are tracked at [DbBump/DbBump](https://github.com/DbBump/DbBump/issues). The documentation linked
-below is for the upstream DbUp project.
+Issues for this fork are tracked at [DbBump/DbBump](https://github.com/DbBump/DbBump/issues).
 
 # Overview
 
@@ -13,7 +12,7 @@ SQL scripts have been run already, and runs the change scripts that are needed t
 
 # Documentation
 
-To learn more about DbUp check out the [documentation](https://dbup.readthedocs.io/en/latest/).
+The documentation is at <https://dbbump.github.io/DbBump/>. Its source is in [`docs-website/`](docs-website).
 
 # Status
 
