@@ -2,28 +2,29 @@
  * Global styles. Docusaurus uses Infima (https://infima.dev) under the hood, so
  * overriding these CSS variables is enough to re-theme the whole site.
  *
- * The primary colour is the green of the DbBump icon.
+ * The primary colour is the blue of "Bump" in the DbBump logo. Dark mode uses a lighter
+ * blue so links keep their contrast against the dark background.
  */
 
 :root {
-  --ifm-color-primary: #1e8a4c;
-  --ifm-color-primary-dark: #1b7c44;
-  --ifm-color-primary-darker: #197541;
-  --ifm-color-primary-darkest: #156035;
-  --ifm-color-primary-light: #219854;
-  --ifm-color-primary-lighter: #239f58;
-  --ifm-color-primary-lightest: #27b463;
+  --ifm-color-primary: #0278ce;
+  --ifm-color-primary-dark: #026cb9;
+  --ifm-color-primary-darker: #0266af;
+  --ifm-color-primary-darkest: #015490;
+  --ifm-color-primary-light: #0284e3;
+  --ifm-color-primary-lighter: #028aed;
+  --ifm-color-primary-lightest: #129afd;
   --ifm-code-font-size: 95%;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
 }
 
 [data-theme='dark'] {
-  --ifm-color-primary: #4cc985;
-  --ifm-color-primary-dark: #38c278;
-  --ifm-color-primary-darker: #33b771;
-  --ifm-color-primary-darkest: #2a975d;
-  --ifm-color-primary-light: #62cf93;
-  --ifm-color-primary-lighter: #6cd29a;
-  --ifm-color-primary-lightest: #8cdcb0;
+  --ifm-color-primary: #4aa8ec;
+  --ifm-color-primary-dark: #2e9be9;
+  --ifm-color-primary-darker: #2094e8;
+  --ifm-color-primary-darkest: #157bc4;
+  --ifm-color-primary-light: #66b5ef;
+  --ifm-color-primary-lighter: #74bcf0;
+  --ifm-color-primary-lightest: #9ed0f5;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
