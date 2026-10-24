@@ -19,14 +19,3 @@ The documentation is at <https://dbbump.github.io/DbBump/>. Its source is in [`d
 | Package     | Build                                                                                                                                                                   | Downloads                                                                                         | Latest Stable                                                                                    | Latest Prerelease                                                                                   | Issues                                                                                                   | Pull Requests                                                                                              |
 |-------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------|
 | DbBump-Core | [![GitHub Actions](https://img.shields.io/github/actions/workflow/status/DbBump/DbBump/main.yml?branch=main)](https://github.com/DbBump/DbBump/actions/workflows/main.yml) | [![NuGet](https://img.shields.io/nuget/dt/dbbump-core.svg)](https://www.nuget.org/packages/dbbump-core) | [![NuGet](https://img.shields.io/nuget/v/dbbump-core.svg)](https://www.nuget.org/packages/dbbump-core) | [![NuGet](https://img.shields.io/nuget/vpre/dbbump-core.svg)](https://www.nuget.org/packages/dbbump-core) | [![view](https://img.shields.io/github/issues/DbBump/DbBump)](https://github.com/DbBump/DbBump/issues) | [![view](https://img.shields.io/github/issues-pr/DbBump/DbBump)](https://github.com/DbBump/DbBump/pulls) |
-
-# Contributing
-
-## NuGet Feed
-
-To build the providers, you will need to add the DbBump NuGet feed to your local machine. Do this by generating
-a GitHub token with `read:package` access and running:
-
-```
-dotnet nuget add source --name DbBump --username <YourUsername> --password <TheToken> https://nuget.pkg.github.com/DbBump/index.json
-```
