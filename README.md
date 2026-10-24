@@ -3,12 +3,12 @@
 DbBump is a fork of [DbUp](https://github.com/DbUp/DbUp). The goal of this fork is to work through DbUp's open issues and
 pull requests: review them, triage them, fix them and merge them in.
 
-Issues for this fork are tracked at [DbBump/DbBump](https://github.com/DbBump/DbBump/issues). The DbUp sections below
-still describe the upstream project.
+Issues for this fork are tracked at [DbBump/DbBump](https://github.com/DbBump/DbBump/issues). The documentation linked
+below is for the upstream DbUp project.
 
-# About DbUp
+# Overview
 
-DbUp is a set of .NET libraries that helps you to deploy changes to different databases like SQL Server. It tracks which
+DbBump is a set of .NET libraries that helps you to deploy changes to different databases like SQL Server. It tracks which
 SQL scripts have been run already, and runs the change scripts that are needed to get your database up to date.
 
 # Documentation
