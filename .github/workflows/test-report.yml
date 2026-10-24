@@ -6,7 +6,7 @@ run-name: Generate Test Report for workflow ${{ github.event.workflow_run.name }
 
 on:
   workflow_run:
-    workflows: [ "Create Draft Release", "CI" ]
+    workflows: [ "Create Release", "CI" ]
     types:
       - completed
 

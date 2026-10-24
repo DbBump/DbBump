@@ -1,8 +1,7 @@
 name: CI
 
-# This workflow builds and tests the code
-# Because of failed permissions all steps which are pushing code to github releases or nuget are removed.
-# For creating draft release launch workflow -Create Draft Release- manually.
+# This workflow builds, tests and packs the code. It does not push packages or create releases.
+# To create a draft release, run the -Create Release- workflow manually.
 
 on:
   pull_request:
@@ -25,12 +24,12 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0 # all
-      
+
       - name: Setup .NET 8.0
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: 8.0.x
-          
+
       - name: Install GitVersion
         uses: gittools/actions/gitversion/setup@v0
         with:
@@ -39,11 +38,11 @@ jobs:
       - name: Run GitVersion
         id: gitversion
         uses: gittools/actions/gitversion/execute@v0
-     
+
       - name: Display SemVer
         run: |
           echo "SemVer: $env:GitVersion_SemVer"
-          
+
       - name: Restore
         run: dotnet restore DbUp.sln
         working-directory: src
@@ -58,15 +57,8 @@ jobs:
 
       - name: Pack
         run: dotnet pack --no-build -c Release -o ../artifacts /p:Version=$env:GitVersion_SemVer DbUp.sln
-        working-directory: src  
+        working-directory: src
 
-      - name: Push NuGet packages to GitHub Packages ⬆️
-        if: ${{ format('{0}', env.GITHUB_TOKEN) != '' && startsWith(github.repository, 'DbBump/') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && github.actor != 'dependabot[bot]' }}
-        working-directory: artifacts
-        run: dotnet nuget push *.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source "https://nuget.pkg.github.com/DbBump/index.json"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
       # https://github.com/dorny/test-reporter#recommended-setup-for-public-repositories
       - name: Upload Test Results
         uses: actions/upload-artifact@v4 # upload test results
@@ -75,11 +67,8 @@ jobs:
           name: test-results
           path: artifacts/TestResults/*.trx
 
-      - name: Create GitHub Release
-        if: ${{ (github.ref_name == 'main' || startsWith(github.ref_name, 'release/')) && format('{0}', env.GITHUB_TOKEN) != '' }}
-        shell: pwsh
-        working-directory: artifacts
-        # Can't just use wildcard in this command due to https://github.com/cli/cli/issues/5099 so use Get-Item
-        run: gh release create --draft ${{ github.ref_name == 'main' && '' || '--prerelease' }}  --target ${{ github.ref_name }} --title $env:GitVersion_SemVer $env:GitVersion_SemVer (Get-Item dbbump-core.*.nupkg)
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload Packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: packages
+          path: artifacts/*.nupkg
